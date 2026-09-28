@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../../../core/api/api_endpoints.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/profile_provider.dart';
 
@@ -302,7 +303,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
 
     final String? avatarPath = user['avatar']?.toString();
     final String? avatarUrl = (avatarPath != null && avatarPath.isNotEmpty)
-        ? 'http://10.0.2.2:8000/storage/${avatarPath.replaceAll(RegExp(r'^/'), '')}'
+        ? '${ApiEndpoints.storageUrl}/${avatarPath.replaceAll(RegExp(r'^/'), '')}'
         : null;
 
     return Scaffold(

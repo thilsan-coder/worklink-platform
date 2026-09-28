@@ -1,33 +1,46 @@
+import 'package:flutter/foundation.dart';
+
 class ApiEndpoints {
   // Base API URL (pointing to local Laravel backend)
-  // For Android Emulator, use 10.0.2.2. For physical device or local web, use localhost/IP.
-  static const String baseUrl = 'http://10.0.2.2:8000/api';
+  // For Android Emulator, use 10.0.2.2. For Web, Windows, or iOS, use localhost.
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:8000/api';
+    }
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return 'http://10.0.2.2:8000/api';
+    }
+    return 'http://localhost:8000/api';
+  }
+
+  // Base storage URL for public uploads (avatars, portfolio images)
+  static String get storageUrl => '${baseUrl.replaceAll('/api', '')}/storage';
 
   // Auth
-  static const String sendOtp = '$baseUrl/auth/send-otp';
-  static const String verifyOtp = '$baseUrl/auth/verify-otp';
-  static const String googleLogin = '$baseUrl/auth/google';
-  static const String facebookLogin = '$baseUrl/auth/facebook';
-  static const String logout = '$baseUrl/auth/logout';
-  static const String userProfile = '$baseUrl/user/profile';
-  static const String profilePhoto = '$baseUrl/profile/photo';
+  static String get sendOtp => '$baseUrl/auth/send-otp';
+  static String get verifyOtp => '$baseUrl/auth/verify-otp';
+  static String get googleLogin => '$baseUrl/auth/google';
+  static String get facebookLogin => '$baseUrl/auth/facebook';
+  static String get logout => '$baseUrl/auth/logout';
+  static String get userProfile => '$baseUrl/user/profile';
+  static String get profilePhoto => '$baseUrl/profile/photo';
 
   // Customer & Worker Profiles
-  static const String customerProfile = '$baseUrl/customer/profile';
-  static const String workerProfile = '$baseUrl/worker/profile';
-  static const String workerPortfolio = '$baseUrl/worker/portfolio';
-  static const String workerVerification = '$baseUrl/worker/verification';
-  static const String workerDocuments = '$baseUrl/worker/documents';
+  static String get customerProfile => '$baseUrl/customer/profile';
+  static String get workerProfile => '$baseUrl/worker/profile';
+  static String get workerPortfolio => '$baseUrl/worker/portfolio';
+  static String get workerVerification => '$baseUrl/worker/verification';
+  static String get workerDocuments => '$baseUrl/worker/documents';
 
   // Categories & Skills
-  static const String categories = '$baseUrl/categories';
-  static const String skills = '$baseUrl/skills';
+  static String get categories => '$baseUrl/categories';
+  static String get skills => '$baseUrl/skills';
 
   // Directory & Jobs
-  static const String workers = '$baseUrl/workers';
-  static const String jobs = '$baseUrl/jobs';
-  static const String chats = '$baseUrl/chats';
-  static const String reviews = '$baseUrl/reviews';
-  static const String complaints = '$baseUrl/complaints';
-  static const String notifications = '$baseUrl/notifications';
+  static String get workers => '$baseUrl/workers';
+  static String get jobs => '$baseUrl/jobs';
+  static String get chats => '$baseUrl/chats';
+  static String get reviews => '$baseUrl/reviews';
+  static String get complaints => '$baseUrl/complaints';
+  static String get notifications => '$baseUrl/notifications';
 }
