@@ -10,24 +10,23 @@ class ApiEndpoints {
   static const String facebookLogin = '$baseUrl/auth/facebook';
   static const String logout = '$baseUrl/auth/logout';
   static const String userProfile = '$baseUrl/user/profile';
+  static const String profilePhoto = '$baseUrl/profile/photo';
+
+  // Customer & Worker Profiles
+  static const String customerProfile = '$baseUrl/customer/profile';
+  static const String workerProfile = '$baseUrl/worker/profile';
+  static const String workerPortfolio = '$baseUrl/worker/portfolio';
+  static const String workerVerification = '$baseUrl/worker/verification';
+  static const String workerDocuments = '$baseUrl/worker/documents';
 
   // Categories & Skills
   static const String categories = '$baseUrl/categories';
   static const String skills = '$baseUrl/skills';
 
-  // Workers
+  // Directory & Jobs
   static const String workers = '$baseUrl/workers';
-  static const String workerProfile = '$baseUrl/worker/profile';
-  static const String workerDocuments = '$baseUrl/worker/documents';
-  static const String workerPortfolio = '$baseUrl/worker/portfolio';
-
-  // Jobs
   static const String jobs = '$baseUrl/jobs';
-
-  // Chats
   static const String chats = '$baseUrl/chats';
-
-  // Reviews & Complaints
   static const String reviews = '$baseUrl/reviews';
   static const String complaints = '$baseUrl/complaints';
   static const String notifications = '$baseUrl/notifications';

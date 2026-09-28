@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\CustomerProfileController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ProfilePhotoController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SkillController;
 use App\Http\Controllers\Api\WorkerController;
@@ -51,16 +52,24 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/user/profile', [AuthController::class, 'userProfile']);
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/profile/photo', [ProfilePhotoController::class, 'upload']);
+    Route::delete('/profile/photo', [ProfilePhotoController::class, 'destroy']);
 
     // Customer Profile Management
     Route::get('/customer/profile', [CustomerProfileController::class, 'show']);
     Route::put('/customer/profile', [CustomerProfileController::class, 'update']);
 
-    // Worker Profile Management
+    // Worker Profile & Portfolio Management
     Route::get('/worker/profile', [WorkerProfileController::class, 'show']);
     Route::put('/worker/profile', [WorkerProfileController::class, 'update']);
+
+    Route::get('/worker/portfolio', [WorkerProfileController::class, 'indexPortfolio']);
+    Route::post('/worker/portfolio', [WorkerProfileController::class, 'storePortfolio']);
+    Route::put('/worker/portfolio/{id}', [WorkerProfileController::class, 'updatePortfolio']);
+    Route::delete('/worker/portfolio/{id}', [WorkerProfileController::class, 'destroyPortfolio']);
+
+    Route::get('/worker/verification', [WorkerProfileController::class, 'verificationStatus']);
     Route::post('/worker/documents', [WorkerProfileController::class, 'uploadDocument']);
-    Route::post('/worker/portfolio', [WorkerProfileController::class, 'uploadPortfolio']);
 
     // Jobs Core Management
     Route::get('/jobs', [JobController::class, 'index']);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PublicWorkerResource;
 use App\Models\WorkerProfile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,18 +44,18 @@ class WorkerController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $workers,
+            'data' => PublicWorkerResource::collection($workers)->response()->getData(true),
         ]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $worker = WorkerProfile::with(['user', 'skills.category', 'documents', 'portfolioItems'])
+        $worker = WorkerProfile::with(['user', 'skills.category', 'portfolioItems'])
             ->findOrFail($id);
 
         return response()->json([
             'success' => true,
-            'data' => $worker,
+            'data' => new PublicWorkerResource($worker),
         ]);
     }
 }
