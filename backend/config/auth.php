@@ -112,6 +112,14 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | OTP Test Mode (Development Only)
+    |--------------------------------------------------------------------------
+    */
+    'otp_test_mode' => env('OTP_TEST_MODE', false),
+    'otp_test_code' => env('OTP_TEST_CODE', '123456'),
+
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
 ];

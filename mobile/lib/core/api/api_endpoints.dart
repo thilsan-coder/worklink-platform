@@ -39,6 +39,14 @@ class ApiEndpoints {
   // Directory & Jobs
   static String get workers => '$baseUrl/workers';
   static String get jobs => '$baseUrl/jobs';
+  static String jobAccept(int id) => '$jobs/$id/accept';
+  static String jobReject(int id) => '$jobs/$id/reject';
+  static String jobSchedule(int id) => '$jobs/$id/schedule';
+  static String jobStart(int id) => '$jobs/$id/start';
+  static String jobComplete(int id) => '$jobs/$id/complete';
+  static String jobCancel(int id) => '$jobs/$id/cancel';
+  static String jobHistory(int id) => '$jobs/$id/history';
+
   static String get chats => '$baseUrl/chats';
   static String get reviews => '$baseUrl/reviews';
   static String get complaints => '$baseUrl/complaints';

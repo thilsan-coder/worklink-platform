@@ -75,12 +75,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/jobs', [JobController::class, 'index']);
     Route::post('/jobs', [JobController::class, 'store']);
     Route::get('/jobs/{id}', [JobController::class, 'show']);
-    Route::post('/jobs/{id}/accept', [JobController::class, 'accept']);
-    Route::post('/jobs/{id}/reject', [JobController::class, 'reject']);
-    Route::post('/jobs/{id}/status', [JobController::class, 'updateStatus']);
-    Route::post('/jobs/{id}/confirm', [JobController::class, 'confirmCompletion']);
+    Route::get('/jobs/{id}/history', [JobController::class, 'history']);
+
+    Route::match(['post', 'put', 'patch'], '/jobs/{id}/accept', [JobController::class, 'accept']);
+    Route::match(['post', 'put', 'patch'], '/jobs/{id}/reject', [JobController::class, 'reject']);
+    Route::match(['post', 'put', 'patch'], '/jobs/{id}/schedule', [JobController::class, 'schedule']);
+    Route::match(['post', 'put', 'patch'], '/jobs/{id}/start', [JobController::class, 'start']);
+    Route::match(['post', 'put', 'patch'], '/jobs/{id}/complete', [JobController::class, 'complete']);
+    Route::match(['post', 'put', 'patch'], '/jobs/{id}/confirm', [JobController::class, 'confirmCompletion']);
+    Route::match(['post', 'put', 'patch'], '/jobs/{id}/status', [JobController::class, 'updateStatus']);
+    Route::match(['post', 'put', 'patch'], '/jobs/{id}/cancel', [JobController::class, 'cancel']);
     Route::post('/jobs/{id}/proof', [JobController::class, 'uploadProof']);
-    Route::post('/jobs/{id}/cancel', [JobController::class, 'cancel']);
 
     // Chat System
     Route::get('/chats', [ChatController::class, 'index']);

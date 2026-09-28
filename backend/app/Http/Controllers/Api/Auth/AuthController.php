@@ -63,24 +63,29 @@ class AuthController extends Controller
 
         $phone = preg_replace('/[^0-9+]/', '', $request->phone);
 
-        $otpRecord = OtpRequest::where('phone', $phone)
-            ->where('is_verified', false)
-            ->where('expires_at', '>', now())
-            ->latest()
-            ->first();
+        $isTestMode = app()->environment('local', 'testing') && config('auth.otp_test_mode') === true;
+        $isTestCode = $isTestMode && $request->otp_code === (string) config('auth.otp_test_code', '123456');
 
-        if (! $otpRecord || $otpRecord->otp_code !== $request->otp_code) {
-            if ($otpRecord) {
-                $otpRecord->increment('attempts');
+        if (! $isTestCode) {
+            $otpRecord = OtpRequest::where('phone', $phone)
+                ->where('is_verified', false)
+                ->where('expires_at', '>', now())
+                ->latest()
+                ->first();
+
+            if (! $otpRecord || $otpRecord->otp_code !== $request->otp_code) {
+                if ($otpRecord) {
+                    $otpRecord->increment('attempts');
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired OTP code.',
+                ], 422);
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid or expired OTP code.',
-            ], 422);
+            $otpRecord->update(['is_verified' => true]);
         }
-
-        $otpRecord->update(['is_verified' => true]);
 
         // Find or create User with account linking
         $user = User::where('phone', $phone)->first();

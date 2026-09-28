@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/discovery/providers/worker_discovery_provider.dart';
+import 'features/jobs/providers/job_provider.dart';
 import 'features/profile/providers/profile_provider.dart';
 import 'features/splash/screens/splash_screen.dart';
 
@@ -21,6 +22,7 @@ class WorkLinkApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => WorkerDiscoveryProvider()),
+        ChangeNotifierProvider(create: (_) => JobProvider()),
       ],
       child: MaterialApp(
         title: 'WorkLink',

@@ -8,6 +8,7 @@ import '../../auth/providers/auth_provider.dart';
 import '../../auth/screens/login_choice_screen.dart';
 import '../../discovery/providers/worker_discovery_provider.dart';
 import '../../discovery/screens/worker_discovery_screen.dart';
+import '../../jobs/screens/customer_jobs_screen.dart';
 import '../../profile/screens/customer_profile_screen.dart';
 import '../../worker/screens/worker_home_screen.dart';
 
@@ -79,7 +80,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         index: _currentIndex,
         children: [
           _buildExploreView(context, userName),
-          const _CustomerJobsTab(),
+          const CustomerJobsScreen(),
           const Center(child: Text('Chat Conversations (Phase 7)')),
           const CustomerProfileScreen(),
         ],
