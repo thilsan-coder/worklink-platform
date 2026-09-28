@@ -1,8 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/api/api_client.dart';
+import '../../../core/api/api_endpoints.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/screens/login_choice_screen.dart';
+import '../../discovery/providers/worker_discovery_provider.dart';
+import '../../discovery/screens/worker_discovery_screen.dart';
 import '../../profile/screens/customer_profile_screen.dart';
 import '../../worker/screens/worker_home_screen.dart';
 
@@ -73,8 +78,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          _buildExploreView(userName),
-          const Center(child: Text('My Jobs List (Phase 6)')),
+          _buildExploreView(context, userName),
+          const _CustomerJobsTab(),
           const Center(child: Text('Chat Conversations (Phase 7)')),
           const CustomerProfileScreen(),
         ],
@@ -94,7 +99,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     );
   }
 
-  Widget _buildExploreView(String userName) {
+  Widget _buildExploreView(BuildContext context, String userName) {
+    final discoveryProvider = context.watch<WorkerDiscoveryProvider>();
+    final categories = discoveryProvider.categories;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -111,56 +119,87 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           ),
           const SizedBox(height: 20),
 
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Search plumbers, electricians, carpenters...',
-              prefixIcon: const Icon(Icons.search_rounded),
-              suffixIcon: Container(
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.tune_rounded, color: Colors.white, size: 20),
+          // Search trigger bar
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const WorkerDiscoveryScreen()),
+              );
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.search_rounded, color: AppColors.textMuted),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Search plumbers, electricians, carpenters...',
+                      style: TextStyle(color: AppColors.textMuted, fontSize: 14),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.tune_rounded, color: Colors.white, size: 18),
+                  ),
+                ],
               ),
             ),
           ),
           const SizedBox(height: 24),
 
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, AppColors.primaryDark],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Verified Skilled Workers',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        'Get top-rated experts with background verification.',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
-                    ],
-                  ),
+          // Verified Workers Promo Banner
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const WorkerDiscoveryScreen()),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, AppColors.primaryDark],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                const Icon(Icons.verified_rounded, size: 48, color: Colors.white),
-              ],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Verified Skilled Workers',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Browse top-rated experts with background verification.',
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.verified_rounded, size: 44, color: Colors.white),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -169,39 +208,61 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Categories',
+                'Browse Categories',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              TextButton(onPressed: () {}, child: const Text('See All')),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const WorkerDiscoveryScreen()),
+                  );
+                },
+                child: const Text('See All'),
+              ),
             ],
           ),
           const SizedBox(height: 12),
 
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            children: [
-              _buildCategoryCard('Plumbing', Icons.plumbing_rounded, Colors.blue),
-              _buildCategoryCard('Electrical', Icons.bolt_rounded, Colors.amber),
-              _buildCategoryCard('Carpentry', Icons.handyman_rounded, Colors.orange),
-              _buildCategoryCard('AC Fixing', Icons.ac_unit_rounded, Colors.cyan),
-              _buildCategoryCard('Painting', Icons.format_paint_rounded, Colors.purple),
-              _buildCategoryCard('Cleaning', Icons.cleaning_services_rounded, Colors.green),
-            ],
-          ),
+          if (categories.isEmpty)
+            const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.0,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final cat = categories[index];
+                return _buildCategoryCard(
+                  context,
+                  cat['id'],
+                  cat['name'] ?? '',
+                  _getCategoryIcon(cat['name']),
+                  _getCategoryColor(index),
+                );
+              },
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildCategoryCard(String title, IconData icon, Color color) {
+  Widget _buildCategoryCard(BuildContext context, int catId, String title, IconData icon, Color color) {
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => WorkerDiscoveryScreen(initialCategoryId: catId),
+            ),
+          );
+        },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -217,9 +278,121 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             Text(
               title,
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  IconData _getCategoryIcon(String? name) {
+    final lower = (name ?? '').toLowerCase();
+    if (lower.contains('plumb')) return Icons.plumbing_rounded;
+    if (lower.contains('electr')) return Icons.bolt_rounded;
+    if (lower.contains('carpent')) return Icons.handyman_rounded;
+    if (lower.contains('paint')) return Icons.format_paint_rounded;
+    if (lower.contains('ac') || lower.contains('air')) return Icons.ac_unit_rounded;
+    if (lower.contains('clean')) return Icons.cleaning_services_rounded;
+    if (lower.contains('garden')) return Icons.yard_rounded;
+    if (lower.contains('mason')) return Icons.foundation_rounded;
+    return Icons.build_rounded;
+  }
+
+  Color _getCategoryColor(int index) {
+    final colors = [
+      Colors.blue,
+      Colors.amber,
+      Colors.orange,
+      Colors.cyan,
+      Colors.purple,
+      Colors.green,
+      Colors.teal,
+      Colors.indigo,
+    ];
+    return colors[index % colors.length];
+  }
+}
+
+class _CustomerJobsTab extends StatefulWidget {
+  const _CustomerJobsTab();
+
+  @override
+  State<_CustomerJobsTab> createState() => _CustomerJobsTabState();
+}
+
+class _CustomerJobsTabState extends State<_CustomerJobsTab> {
+  bool _isLoading = true;
+  String? _error;
+  List<dynamic> _jobs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCustomerJobs();
+  }
+
+  Future<void> _fetchCustomerJobs() async {
+    try {
+      final res = await ApiClient.instance.client.get(ApiEndpoints.jobs);
+      if (res.statusCode == 200 && res.data['success'] == true) {
+        setState(() {
+          _jobs = res.data['data']['data'] ?? [];
+          _isLoading = false;
+        });
+      }
+    } on DioException catch (e) {
+      setState(() {
+        _error = e.response?.data['message'] ?? 'Failed to load jobs';
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 40),
+            const SizedBox(height: 8),
+            Text(_error!),
+            ElevatedButton(onPressed: _fetchCustomerJobs, child: const Text('Retry')),
+          ],
+        ),
+      );
+    }
+
+    if (_jobs.isEmpty) {
+      return const Center(
+        child: Text('No job requests submitted yet.', style: TextStyle(color: AppColors.textMuted)),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _fetchCustomerJobs,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _jobs.length,
+        itemBuilder: (context, index) {
+          final job = _jobs[index];
+          return Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: ListTile(
+              title: Text(job['title'] ?? 'Job Request', style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('${job['description']}\nStatus: ${job['status']}'),
+              trailing: Chip(
+                label: Text(job['status'] ?? '', style: const TextStyle(fontSize: 11, color: Colors.white)),
+                backgroundColor: AppColors.primary,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

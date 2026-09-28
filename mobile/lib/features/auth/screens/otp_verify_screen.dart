@@ -128,6 +128,9 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    final debugOtp = authProvider.lastDebugOtp;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Verify Phone')),
       body: SafeArea(
@@ -145,6 +148,36 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                 'Enter the 6-digit code sent to ${widget.phone}',
                 style: const TextStyle(color: AppColors.textSecondary),
               ),
+              if (debugOtp != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withAlpha(20),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.primary.withAlpha(60)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline_rounded, size: 20, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Test OTP Code: $debugOtp',
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          _otpController.text = debugOtp;
+                          _verifyOtp();
+                        },
+                        child: const Text('Auto-Fill'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 24),
 
               TextFormField(

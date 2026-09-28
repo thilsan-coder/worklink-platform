@@ -44,6 +44,130 @@ class _PublicWorkerProfileScreenState extends State<PublicWorkerProfileScreen> {
     }
   }
 
+  void _showServiceRequestDialog(Map<String, dynamic> worker) {
+    final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
+    final addressController = TextEditingController(text: worker['address'] ?? '');
+    final cityController = TextEditingController(text: 'Colombo');
+    final formKey = GlobalKey<FormState>();
+    bool isSubmitting = false;
+
+    final List skills = worker['skills'] ?? [];
+    final int selectedCategoryId = (skills.isNotEmpty && skills.first['category_id'] != null)
+        ? skills.first['category_id']
+        : 1;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text('Request Service from ${worker['name']}'),
+              content: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Job Title',
+                          hintText: 'e.g. Repair Leaking Pipe',
+                        ),
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter job title' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: descriptionController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          labelText: 'Description',
+                          hintText: 'Describe the work needed in detail...',
+                        ),
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter description' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: addressController,
+                        decoration: const InputDecoration(
+                          labelText: 'Street Address',
+                          hintText: '123 Main Street',
+                        ),
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter address' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: cityController,
+                        decoration: const InputDecoration(
+                          labelText: 'City / District',
+                          hintText: 'Colombo',
+                        ),
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter city' : null,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isSubmitting ? null : () => Navigator.of(dialogContext).pop(),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () async {
+                          if (!formKey.currentState!.validate()) return;
+
+                          final messenger = ScaffoldMessenger.of(context);
+                          final nav = Navigator.of(dialogContext);
+
+                          try {
+                            final res = await ApiClient.instance.client.post(
+                              ApiEndpoints.jobs,
+                              data: {
+                                'worker_id': worker['user_id'],
+                                'category_id': selectedCategoryId,
+                                'title': titleController.text.trim(),
+                                'description': descriptionController.text.trim(),
+                                'address_line1': addressController.text.trim(),
+                                'city': cityController.text.trim(),
+                                'latitude': 6.9271,
+                                'longitude': 79.8612,
+                              },
+                            );
+
+                            nav.pop();
+                            if (res.statusCode == 201 && res.data['success'] == true) {
+                              messenger.showSnackBar(
+                                const SnackBar(
+                                  content: Text('Service request submitted successfully! Worker notified.'),
+                                  backgroundColor: AppColors.secondary,
+                                ),
+                              );
+                            }
+                          } on DioException catch (e) {
+                            setDialogState(() => isSubmitting = false);
+                            final msg = e.response?.data['message'] ?? 'Failed to submit request. Please log in as Customer.';
+                            messenger.showSnackBar(
+                              SnackBar(content: Text(msg), backgroundColor: AppColors.error),
+                            );
+                          }
+                        },
+                  child: isSubmitting
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Text('Submit Request'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -230,14 +354,13 @@ class _PublicWorkerProfileScreenState extends State<PublicWorkerProfileScreen> {
               ),
             const SizedBox(height: 32),
 
-            ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Job Request workflow ready for Phase 6')),
-                );
-              },
-              icon: const Icon(Icons.send_rounded),
-              label: Text('Request Service (${worker['name']})'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _showServiceRequestDialog(worker),
+                icon: const Icon(Icons.send_rounded),
+                label: Text('Request Service (${worker['name']})'),
+              ),
             ),
           ],
         ),

@@ -14,12 +14,15 @@ class AuthProvider extends ChangeNotifier {
   Map<String, String>? _fieldErrors;
   bool _isNewUser = false;
 
+  String? _lastDebugOtp;
+
   AuthStatus get status => _status;
   Map<String, dynamic>? get user => _user;
   String get activeRole => _activeRole;
   String? get errorMessage => _errorMessage;
   Map<String, String>? get fieldErrors => _fieldErrors;
   bool get isNewUser => _isNewUser;
+  String? get lastDebugOtp => _lastDebugOtp;
 
   bool get isAuthenticated => _status == AuthStatus.authenticated;
 
@@ -57,7 +60,12 @@ class AuthProvider extends ChangeNotifier {
         ApiEndpoints.sendOtp,
         data: {'phone': phone},
       );
-      return response.data['success'] == true;
+      if (response.data['success'] == true) {
+        _lastDebugOtp = response.data['data']?['debug_otp']?.toString();
+        notifyListeners();
+        return true;
+      }
+      return false;
     } on DioException catch (e) {
       _handleDioError(e);
       notifyListeners();
