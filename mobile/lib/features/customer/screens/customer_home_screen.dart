@@ -25,6 +25,21 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   int _currentIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final discovery = context.read<WorkerDiscoveryProvider>();
+      if (discovery.categories.isEmpty) {
+        discovery.fetchCategories();
+      }
+      if (discovery.skills.isEmpty) {
+        discovery.fetchSkills();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final userName = auth.user?['name'] ?? 'Customer';
