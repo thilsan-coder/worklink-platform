@@ -247,7 +247,7 @@ class ReviewAndDemoDataTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'user_id' => $this->workerUser->id,
-            'type' => 'review_received',
+            'type' => 'NEW_REVIEW',
         ]);
     }
 

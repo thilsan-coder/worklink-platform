@@ -10,6 +10,7 @@ import '../../chat/screens/conversations_screen.dart';
 import '../../discovery/providers/worker_discovery_provider.dart';
 import '../../discovery/screens/worker_discovery_screen.dart';
 import '../../jobs/screens/customer_jobs_screen.dart';
+import '../../notifications/widgets/notification_badge_icon.dart';
 import '../../profile/screens/customer_profile_screen.dart';
 import '../../worker/screens/worker_home_screen.dart';
 
@@ -48,6 +49,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           ],
         ),
         actions: [
+          const NotificationBadgeIcon(),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded),
             tooltip: 'Switch to Worker Mode',

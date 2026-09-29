@@ -59,4 +59,9 @@ class ApiEndpoints {
   static String workerRating(int workerId) => '$baseUrl/workers/$workerId/rating';
   static String get complaints => '$baseUrl/complaints';
   static String get notifications => '$baseUrl/notifications';
+  static String get notificationsUnreadCount => '$baseUrl/notifications/unread-count';
+  static String notificationRead(int id) => '$baseUrl/notifications/$id/read';
+  static String get notificationsReadAll => '$baseUrl/notifications/read-all';
+  static String notificationDelete(int id) => '$baseUrl/notifications/$id';
+  static String get notificationsClearAll => '$baseUrl/notifications';
 }

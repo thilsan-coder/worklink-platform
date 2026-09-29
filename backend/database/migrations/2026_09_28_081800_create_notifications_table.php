@@ -13,14 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('title');
             $table->text('body');
-            $table->enum('type', [
-                'job_request',
-                'job_status',
-                'chat_message',
-                'review_received',
-                'complaint_update',
-                'admin_announcement'
-            ])->default('job_status');
+            $table->string('type', 50)->default('job_status');
             $table->unsignedBigInteger('reference_id')->nullable();
             $table->json('data')->nullable();
             $table->boolean('is_read')->default(false);

@@ -338,7 +338,7 @@ class JobManagementTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'user_id' => $this->customer->id,
-            'type' => 'job_status',
+            'type' => 'JOB_ACCEPTED',
             'reference_id' => $job->id,
         ]);
     }

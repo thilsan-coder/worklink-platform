@@ -121,10 +121,19 @@ class ReviewController extends Controller
         // Send Notification to worker
         Notification::create([
             'user_id' => $job->worker_id,
-            'title' => 'New ' . (int) $ratingValue . '★ Review Received',
+            'title' => 'New Review',
             'body' => $user->name . ' submitted a ' . (int) $ratingValue . '-star review for "' . $job->title . '".',
-            'type' => 'review_received',
+            'type' => 'NEW_REVIEW',
             'reference_id' => $review->id,
+            'data' => [
+                'entity_type' => 'review',
+                'entity_id' => $review->id,
+                'review_id' => $review->id,
+                'job_id' => $job->id,
+                'worker_id' => $job->worker_id,
+                'customer_id' => $user->id,
+                'rating' => (float) $ratingValue,
+            ],
         ]);
 
         return response()->json([

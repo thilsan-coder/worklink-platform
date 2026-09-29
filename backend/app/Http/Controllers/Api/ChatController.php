@@ -165,10 +165,19 @@ class ChatController extends Controller
         $recipientId = ($chat->customer_id === $user->id) ? $chat->worker_id : $chat->customer_id;
         Notification::create([
             'user_id' => $recipientId,
-            'title' => 'New message from ' . $user->name,
-            'body' => Str::limit($messageText ?: 'Sent an attachment', 60),
-            'type' => 'chat_message',
+            'title' => 'New Message',
+            'body' => $user->name . ' sent you a message: ' . Str::limit($messageText ?: 'Sent an attachment', 50),
+            'type' => 'NEW_MESSAGE',
             'reference_id' => $chat->id,
+            'data' => [
+                'entity_type' => 'chat',
+                'entity_id' => $chat->id,
+                'chat_id' => $chat->id,
+                'conversation_id' => $chat->id,
+                'job_id' => $chat->job_id,
+                'sender_id' => $user->id,
+                'sender_name' => $user->name,
+            ],
         ]);
 
         return response()->json([

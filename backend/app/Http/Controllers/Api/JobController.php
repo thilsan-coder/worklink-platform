@@ -124,10 +124,16 @@ class JobController extends Controller
 
         Notification::create([
             'user_id' => $validated['worker_id'],
-            'title' => 'New Job Request',
-            'body' => 'You received a new job request: ' . $job->title,
-            'type' => 'job_request',
+            'title' => 'New Service Request',
+            'body' => 'Customer requested your service: ' . $job->title,
+            'type' => 'JOB_REQUESTED',
             'reference_id' => $job->id,
+            'data' => [
+                'entity_type' => 'job',
+                'entity_id' => $job->id,
+                'job_id' => $job->id,
+                'customer_id' => $user->id,
+            ],
         ]);
 
         return response()->json([
@@ -185,10 +191,16 @@ class JobController extends Controller
 
         Notification::create([
             'user_id' => $job->customer_id,
-            'title' => 'Job Request Accepted',
-            'body' => 'The worker accepted your job request: ' . $job->title,
-            'type' => 'job_status',
+            'title' => 'Job Accepted',
+            'body' => 'Your service request has been accepted: ' . $job->title,
+            'type' => 'JOB_ACCEPTED',
             'reference_id' => $job->id,
+            'data' => [
+                'entity_type' => 'job',
+                'entity_id' => $job->id,
+                'job_id' => $job->id,
+                'worker_id' => $user->id,
+            ],
         ]);
 
         return response()->json([
@@ -232,10 +244,17 @@ class JobController extends Controller
 
         Notification::create([
             'user_id' => $job->customer_id,
-            'title' => 'Job Request Declined',
-            'body' => 'The worker declined your job request.',
-            'type' => 'job_status',
+            'title' => 'Job Rejected',
+            'body' => 'The worker declined your job request: ' . ($request->reason ?? $job->title),
+            'type' => 'JOB_REJECTED',
             'reference_id' => $job->id,
+            'data' => [
+                'entity_type' => 'job',
+                'entity_id' => $job->id,
+                'job_id' => $job->id,
+                'worker_id' => $user->id,
+                'reason' => $request->reason,
+            ],
         ]);
 
         return response()->json([
@@ -285,8 +304,14 @@ class JobController extends Controller
             'user_id' => $recipientId,
             'title' => 'Job Scheduled',
             'body' => 'Job appointment scheduled for: ' . date('M d, Y H:i', strtotime($request->scheduled_at)),
-            'type' => 'job_status',
+            'type' => 'JOB_SCHEDULED',
             'reference_id' => $job->id,
+            'data' => [
+                'entity_type' => 'job',
+                'entity_id' => $job->id,
+                'job_id' => $job->id,
+                'scheduled_at' => $request->scheduled_at,
+            ],
         ]);
 
         return response()->json([
@@ -328,10 +353,16 @@ class JobController extends Controller
 
         Notification::create([
             'user_id' => $job->customer_id,
-            'title' => 'Work Started',
+            'title' => 'Job Started',
             'body' => 'The worker has started work on your job: ' . $job->title,
-            'type' => 'job_status',
+            'type' => 'JOB_STARTED',
             'reference_id' => $job->id,
+            'data' => [
+                'entity_type' => 'job',
+                'entity_id' => $job->id,
+                'job_id' => $job->id,
+                'worker_id' => $user->id,
+            ],
         ]);
 
         return response()->json([
@@ -380,9 +411,14 @@ class JobController extends Controller
         Notification::create([
             'user_id' => $recipientId,
             'title' => 'Job Completed',
-            'body' => 'The job has been marked as COMPLETED!',
-            'type' => 'job_status',
+            'body' => 'The job has been marked as completed: ' . $job->title,
+            'type' => 'JOB_COMPLETED',
             'reference_id' => $job->id,
+            'data' => [
+                'entity_type' => 'job',
+                'entity_id' => $job->id,
+                'job_id' => $job->id,
+            ],
         ]);
 
         return response()->json([
@@ -429,8 +465,14 @@ class JobController extends Controller
             'user_id' => $recipientId,
             'title' => 'Job Cancelled',
             'body' => 'Job was cancelled: ' . $request->reason,
-            'type' => 'job_status',
+            'type' => 'JOB_CANCELLED',
             'reference_id' => $job->id,
+            'data' => [
+                'entity_type' => 'job',
+                'entity_id' => $job->id,
+                'job_id' => $job->id,
+                'reason' => $request->reason,
+            ],
         ]);
 
         return response()->json([

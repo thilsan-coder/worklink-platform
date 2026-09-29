@@ -301,7 +301,7 @@ class ChatSystemTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'user_id' => $this->worker1->id,
-            'type' => 'chat_message',
+            'type' => 'NEW_MESSAGE',
             'reference_id' => $chat->id,
         ]);
     }

@@ -6,6 +6,7 @@ import '../../auth/screens/login_choice_screen.dart';
 import '../../chat/screens/conversations_screen.dart';
 import '../../customer/screens/customer_home_screen.dart';
 import '../../jobs/screens/worker_jobs_screen.dart';
+import '../../notifications/widgets/notification_badge_icon.dart';
 import '../../profile/screens/worker_profile_screen.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
@@ -45,6 +46,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           ],
         ),
         actions: [
+          const NotificationBadgeIcon(),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded),
             tooltip: 'Switch to Customer Mode',

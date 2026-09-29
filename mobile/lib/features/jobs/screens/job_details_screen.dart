@@ -34,11 +34,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
   void _openChat(BuildContext context) async {
     final chatProvider = context.read<ChatProvider>();
+    final nav = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final conv = await chatProvider.getOrCreateJobConversation(widget.jobId);
     if (conv != null && mounted) {
       final convId = conv['id'] ?? conv['conversation_id'];
-      Navigator.of(context).push(
+      nav.push(
         MaterialPageRoute(
           builder: (_) => ChatScreen(
             conversationId: convId,

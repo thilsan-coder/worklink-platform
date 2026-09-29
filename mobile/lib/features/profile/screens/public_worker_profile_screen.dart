@@ -469,7 +469,7 @@ class _PublicWorkerProfileScreenState extends State<PublicWorkerProfileScreen> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: reviews.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        separatorBuilder: (context, index) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final rev = reviews[index];
                           final custName = rev['customer_name'] ?? rev['customer']?['name'] ?? 'Customer';

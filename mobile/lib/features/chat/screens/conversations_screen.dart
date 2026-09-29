@@ -107,7 +107,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: conversations.length,
-          separatorBuilder: (_, __) => const Divider(height: 1, indent: 72),
+          separatorBuilder: (context, index) => const Divider(height: 1, indent: 72),
           itemBuilder: (context, index) {
             final conv = conversations[index] as Map<String, dynamic>;
             final conversationId = conv['id'] ?? conv['conversation_id'];
