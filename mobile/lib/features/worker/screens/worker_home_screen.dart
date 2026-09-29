@@ -27,20 +27,30 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.secondary.withAlpha(20),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.secondary),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.engineering_rounded, size: 16, color: AppColors.secondary),
-                  const SizedBox(width: 4),
-                  Text('Worker Mode ($userName)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.secondary)),
-                ],
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.secondary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.secondary),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.engineering_rounded, size: 16, color: AppColors.secondary),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        'Worker Mode ($userName)',
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.secondary),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

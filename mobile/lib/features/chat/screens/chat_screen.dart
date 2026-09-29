@@ -22,17 +22,27 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _hasScrolled = false;
+  ChatProvider? _chatProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _chatProvider = context.read<ChatProvider>();
+  }
 
   @override
   void initState() {
     super.initState();
-    final provider = context.read<ChatProvider>();
-    if (widget.initialConversation != null) {
-      provider.setActiveConversation(widget.initialConversation!);
-    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final provider = context.read<ChatProvider>();
+      if (widget.initialConversation != null) {
+        provider.setActiveConversation(widget.initialConversation!);
+      }
       provider.fetchMessages(widget.conversationId).then((_) {
-        _scrollToBottom();
+        if (mounted) {
+          _scrollToBottom();
+        }
       });
       provider.startPolling(widget.conversationId);
       provider.markConversationRead(widget.conversationId);
@@ -41,7 +51,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    context.read<ChatProvider>().stopPolling();
+    _chatProvider?.stopPolling();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -146,10 +156,12 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        'Job: $jobTitle',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                        overflow: TextOverflow.ellipsis,
+                      Expanded(
+                        child: Text(
+                          'Job: $jobTitle',
+                          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),

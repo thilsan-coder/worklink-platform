@@ -33,16 +33,24 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
               'Location',
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: const [
                 Icon(Icons.location_on_rounded, size: 16, color: AppColors.primary),
                 SizedBox(width: 4),
-                Text('Current Location', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                Flexible(
+                  child: Text(
+                    'Current Location',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
                 Icon(Icons.keyboard_arrow_down_rounded, size: 16),
               ],
             ),
@@ -237,7 +245,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 crossAxisCount: 3,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 1.0,
+                childAspectRatio: 0.95,
               ),
               itemCount: categories.length,
               itemBuilder: (context, index) {
@@ -267,26 +275,29 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             ),
           );
         },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withAlpha(25),
-                shape: BoxShape.circle,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withAlpha(25),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 26),
               ),
-              child: Icon(icon, color: color, size: 28),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              const SizedBox(height: 6),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
