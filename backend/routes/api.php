@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\CustomerProfileController;
 use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProfilePhotoController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SkillController;
@@ -124,6 +125,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::match(['patch', 'post'], '/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
     Route::delete('/notifications', [NotificationController::class, 'clearAll']);
+
+    // Payments & Transactions (Phase 11)
+    Route::get('/jobs/{job}/payment', [PaymentController::class, 'jobPayment']);
+    Route::post('/jobs/{job}/payment', [PaymentController::class, 'processPayment']);
+    Route::get('/payments', [PaymentController::class, 'index']);
+    Route::get('/payments/{payment}', [PaymentController::class, 'show']);
+    Route::get('/transactions', [PaymentController::class, 'transactions']);
+    Route::get('/transactions/{transaction}', [PaymentController::class, 'showTransaction']);
+    Route::get('/worker/earnings', [PaymentController::class, 'workerEarnings']);
 });
 
 /*

@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/api/api_endpoints.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../payments/screens/payment_history_screen.dart';
 import '../providers/profile_provider.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
@@ -286,6 +287,21 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                 child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                               )
                             : const Text('Save Profile Changes'),
+                      )
+                    else
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const PaymentHistoryScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.receipt_long_rounded),
+                        label: const Text('View Payment History'),
                       ),
                   ],
                 ),

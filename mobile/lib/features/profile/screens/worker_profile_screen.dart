@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/api/api_endpoints.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../payments/screens/worker_earnings_screen.dart';
 import '../providers/profile_provider.dart';
 
 class WorkerProfileScreen extends StatefulWidget {
@@ -310,6 +311,17 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
       appBar: AppBar(
         title: const Text('Worker Service Profile'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.account_balance_wallet_rounded, color: AppColors.secondary),
+            tooltip: 'My Earnings',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const WorkerEarningsScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(_isEditing ? Icons.close_rounded : Icons.edit_rounded),
             onPressed: () {

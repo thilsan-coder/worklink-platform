@@ -4,6 +4,9 @@ import '../../../core/theme/app_colors.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../chat/providers/chat_provider.dart';
 import '../../chat/screens/chat_screen.dart';
+import '../../payments/providers/payment_provider.dart';
+import '../../payments/screens/customer_payment_screen.dart';
+import '../../payments/screens/payment_details_screen.dart';
 import '../../profile/screens/public_worker_profile_screen.dart';
 import '../../reviews/providers/review_provider.dart';
 import '../../reviews/widgets/review_modal_sheet.dart';
@@ -29,6 +32,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<JobProvider>().fetchJobDetails(widget.jobId);
       context.read<ReviewProvider>().fetchJobReview(widget.jobId);
+      context.read<PaymentProvider>().fetchJobPaymentDetails(widget.jobId);
     });
   }
 
@@ -404,7 +408,103 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
               history: provider.jobHistory,
               currentStatus: status,
             ),
-            const SizedBox(height: 20),
+            // Payment & Billing Section for Completed Jobs
+            Consumer<PaymentProvider>(
+              builder: (context, payProv, _) {
+                final bool isCompleted = ['COMPLETED', 'WORK_COMPLETED', 'CUSTOMER_CONFIRMED'].contains(status.toUpperCase());
+                if (!isCompleted) return const SizedBox.shrink();
+
+                final payDetails = payProv.jobPaymentDetails;
+                final payment = payDetails?.payment ?? (job['payment'] is Map<String, dynamic> ? null : null);
+                final bool isPaid = payDetails?.isPaid == true || payment?.isPaid == true || job['payment']?['status'] == 'PAID';
+                final String formattedAmount = payDetails?.formattedAmount ?? (job['final_cost'] != null ? 'LKR ${job['final_cost']}' : 'LKR 5,000.00');
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  color: isPaid ? const Color(0xFFF0FDF4) : const Color(0xFFFFFBEB),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(
+                      color: isPaid ? const Color(0xFF10B981).withAlpha(100) : const Color(0xFFF59E0B).withAlpha(100),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              isPaid ? Icons.check_circle_rounded : Icons.account_balance_wallet_rounded,
+                              color: isPaid ? const Color(0xFF10B981) : const Color(0xFFD97706),
+                              size: 24,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isPaid ? 'Payment Received' : 'Payment Due',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: isPaid ? const Color(0xFF065F46) : const Color(0xFF92400E),
+                                    ),
+                                  ),
+                                  Text(
+                                    formattedAmount,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isPaid)
+                              TextButton.icon(
+                                onPressed: () {
+                                  if (payDetails?.payment?.id != null) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => PaymentDetailsScreen(paymentId: payDetails!.payment!.id),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Payment marked as paid.')),
+                                    );
+                                  }
+                                },
+                                icon: const Icon(Icons.receipt_long_rounded, size: 16),
+                                label: const Text('Receipt'),
+                              )
+                            else if (!isWorker)
+                              FilledButton.icon(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => CustomerPaymentScreen(
+                                        jobId: widget.jobId,
+                                        initialDetails: payDetails,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.payment_rounded, size: 16),
+                                label: const Text('Pay Now', style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
 
             // Review & Rating Section for Completed Jobs
             Consumer<ReviewProvider>(

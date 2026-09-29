@@ -88,6 +88,26 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
+    public function customerPayments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'customer_id');
+    }
+
+    public function workerPayments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'worker_id');
+    }
+
+    public function customerTransactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'customer_id');
+    }
+
+    public function workerTransactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'worker_id');
+    }
+
     public function isCustomer(): bool
     {
         return in_array($this->role, ['customer', 'both']);

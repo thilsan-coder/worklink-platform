@@ -64,4 +64,12 @@ class ApiEndpoints {
   static String get notificationsReadAll => '$baseUrl/notifications/read-all';
   static String notificationDelete(int id) => '$baseUrl/notifications/$id';
   static String get notificationsClearAll => '$baseUrl/notifications';
+
+  // Payments & Transactions (Phase 11)
+  static String jobPayment(int jobId) => '$baseUrl/jobs/$jobId/payment';
+  static String get payments => '$baseUrl/payments';
+  static String paymentDetails(int id) => '$baseUrl/payments/$id';
+  static String get transactions => '$baseUrl/transactions';
+  static String transactionDetails(int id) => '$baseUrl/transactions/$id';
+  static String get workerEarnings => '$baseUrl/worker/earnings';
 }

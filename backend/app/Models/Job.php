@@ -93,4 +93,19 @@ class Job extends Model
     {
         return $this->hasMany(Complaint::class);
     }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class)->latestOfMany();
+    }
+
+    public function successfulPayment(): HasOne
+    {
+        return $this->hasOne(Payment::class)->where('status', 'PAID');
+    }
 }

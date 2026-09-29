@@ -45,5 +45,8 @@ class DatabaseSeeder extends Seeder
 
         // 8. Seed Notifications
         $this->call(DevelopmentNotificationSeeder::class);
+
+        // 9. Seed Payments and Transactions (Phase 11)
+        $this->call(DevelopmentPaymentSeeder::class);
     }
 }

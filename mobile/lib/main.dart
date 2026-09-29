@@ -6,6 +6,7 @@ import 'features/chat/providers/chat_provider.dart';
 import 'features/discovery/providers/worker_discovery_provider.dart';
 import 'features/jobs/providers/job_provider.dart';
 import 'features/notifications/providers/notification_provider.dart';
+import 'features/payments/providers/payment_provider.dart';
 import 'features/profile/providers/profile_provider.dart';
 import 'features/reviews/providers/review_provider.dart';
 import 'features/splash/screens/splash_screen.dart';
@@ -29,6 +30,7 @@ class WorkLinkApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
       ],
       child: MaterialApp(
         title: 'WorkLink',
