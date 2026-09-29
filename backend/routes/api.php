@@ -1,7 +1,17 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AdminAuditLogController;
 use App\Http\Controllers\Api\Admin\AdminAuthController;
+use App\Http\Controllers\Api\Admin\AdminConversationController;
 use App\Http\Controllers\Api\Admin\AdminDashboardController;
+use App\Http\Controllers\Api\Admin\AdminJobController;
+use App\Http\Controllers\Api\Admin\AdminNotificationController;
+use App\Http\Controllers\Api\Admin\AdminPaymentController;
+use App\Http\Controllers\Api\Admin\AdminReviewController;
+use App\Http\Controllers\Api\Admin\AdminTransactionController;
+use App\Http\Controllers\Api\Admin\AdminUserController;
+use App\Http\Controllers\Api\Admin\AdminVerificationController;
+use App\Http\Controllers\Api\Admin\AdminWorkerController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
@@ -142,11 +152,57 @@ Route::middleware('auth:sanctum')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    // Auth & Profile
     Route::get('/profile', [AdminAuthController::class, 'profile']);
     Route::post('/logout', [AdminAuthController::class, 'logout']);
 
+    // Dashboard & Stats
+    Route::get('/dashboard', [AdminDashboardController::class, 'stats']);
     Route::get('/stats', [AdminDashboardController::class, 'stats']);
+    Route::get('/recent-activity', [AdminDashboardController::class, 'recentActivity']);
+
+    // User Management
+    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users/{id}', [AdminUserController::class, 'show']);
+    Route::patch('/users/{id}/status', [AdminUserController::class, 'updateStatus']);
+    Route::post('/users/{id}/status', [AdminUserController::class, 'updateStatus']);
+
+    // Worker Management
+    Route::get('/workers', [AdminWorkerController::class, 'index']);
+    Route::get('/workers/{id}', [AdminWorkerController::class, 'show']);
+
+    // Verification Management
+    Route::get('/verifications', [AdminVerificationController::class, 'index']);
+    Route::get('/verifications/{id}', [AdminVerificationController::class, 'show']);
+    Route::post('/verifications/{id}/approve', [AdminVerificationController::class, 'approve']);
+    Route::post('/verifications/{id}/reject', [AdminVerificationController::class, 'reject']);
+
+    // Legacy verification routes compatibility
     Route::get('/workers/pending', [AdminDashboardController::class, 'pendingWorkers']);
     Route::post('/workers/{id}/verify', [AdminDashboardController::class, 'verifyWorker']);
     Route::post('/complaints/{id}/resolve', [AdminDashboardController::class, 'resolveComplaint']);
+
+    // Job Management
+    Route::get('/jobs', [AdminJobController::class, 'index']);
+    Route::get('/jobs/{id}', [AdminJobController::class, 'show']);
+
+    // Conversation Management
+    Route::get('/conversations', [AdminConversationController::class, 'index']);
+    Route::get('/conversations/{id}', [AdminConversationController::class, 'show']);
+
+    // Review Management
+    Route::get('/reviews', [AdminReviewController::class, 'index']);
+    Route::get('/reviews/{id}', [AdminReviewController::class, 'show']);
+    Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy']);
+
+    // Payment & Transaction Management
+    Route::get('/payments', [AdminPaymentController::class, 'index']);
+    Route::get('/payments/{id}', [AdminPaymentController::class, 'show']);
+    Route::get('/transactions', [AdminTransactionController::class, 'index']);
+    Route::get('/transactions/{id}', [AdminTransactionController::class, 'show']);
+
+    // Notification & Audit Logs
+    Route::get('/notifications', [AdminNotificationController::class, 'index']);
+    Route::get('/audit-logs', [AdminAuditLogController::class, 'index']);
 });
+
