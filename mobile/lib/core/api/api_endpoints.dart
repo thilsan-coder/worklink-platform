@@ -48,6 +48,11 @@ class ApiEndpoints {
   static String jobHistory(int id) => '$jobs/$id/history';
 
   static String get chats => '$baseUrl/chats';
+  static String get conversations => '$baseUrl/conversations';
+  static String conversationMessages(int id) => '$baseUrl/conversations/$id/messages';
+  static String conversationRead(int id) => '$baseUrl/conversations/$id/read';
+  static String messageRead(int id) => '$baseUrl/messages/$id/read';
+  static String jobConversation(int jobId) => '$baseUrl/jobs/$jobId/conversation';
   static String get reviews => '$baseUrl/reviews';
   static String get complaints => '$baseUrl/complaints';
   static String get notifications => '$baseUrl/notifications';

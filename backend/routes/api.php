@@ -87,10 +87,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::match(['post', 'put', 'patch'], '/jobs/{id}/cancel', [JobController::class, 'cancel']);
     Route::post('/jobs/{id}/proof', [JobController::class, 'uploadProof']);
 
-    // Chat System
+    // Jobs & Conversation Link
+    Route::match(['get', 'post'], '/jobs/{job}/conversation', [ChatController::class, 'forJob']);
+    Route::match(['get', 'post'], '/jobs/{job}/chat', [ChatController::class, 'forJob']);
+
+    // Chat & Messaging System
+    Route::get('/conversations', [ChatController::class, 'index']);
+    Route::get('/conversations/{id}/messages', [ChatController::class, 'messages']);
+    Route::post('/conversations/{id}/messages', [ChatController::class, 'sendMessage']);
+    Route::post('/conversations/{id}/read', [ChatController::class, 'markConversationAsRead']);
+
     Route::get('/chats', [ChatController::class, 'index']);
     Route::get('/chats/{id}/messages', [ChatController::class, 'messages']);
     Route::post('/chats/{id}/messages', [ChatController::class, 'sendMessage']);
+    Route::post('/chats/{id}/read', [ChatController::class, 'markConversationAsRead']);
+
+    Route::patch('/messages/{id}/read', [ChatController::class, 'markAsRead']);
 
     // Reviews & Complaints
     Route::post('/reviews', [ReviewController::class, 'store']);

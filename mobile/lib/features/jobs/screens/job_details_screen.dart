@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../chat/providers/chat_provider.dart';
+import '../../chat/screens/chat_screen.dart';
 import '../../profile/screens/public_worker_profile_screen.dart';
 import '../providers/job_provider.dart';
 import '../widgets/status_timeline_widget.dart';
@@ -25,6 +27,27 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<JobProvider>().fetchJobDetails(widget.jobId);
     });
+  }
+
+  void _openChat(BuildContext context) async {
+    final chatProvider = context.read<ChatProvider>();
+    final messenger = ScaffoldMessenger.of(context);
+    final conv = await chatProvider.getOrCreateJobConversation(widget.jobId);
+    if (conv != null && mounted) {
+      final convId = conv['id'] ?? conv['conversation_id'];
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ChatScreen(
+            conversationId: convId,
+            initialConversation: conv,
+          ),
+        ),
+      );
+    } else if (mounted) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(chatProvider.messageError ?? 'Unable to open chat.')),
+      );
+    }
   }
 
   void _showCancelDialog(BuildContext context, JobProvider provider) {
@@ -262,30 +285,61 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
             // Party Card (Worker / Customer Info)
             Card(
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: AppColors.primary.withAlpha(20),
-                  child: const Icon(Icons.person_rounded, color: AppColors.primary),
-                ),
-                title: Text(
-                  isWorker ? (customer['name'] ?? 'Customer') : (worker['name'] ?? 'Worker'),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text(
-                  isWorker ? 'Customer' : 'Skilled Worker (${workerProfile['address'] ?? 'Active'})',
-                ),
-                trailing: !isWorker && workerProfile['id'] != null
-                    ? OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => PublicWorkerProfileScreen(workerProfileId: workerProfile['id']),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(
+                        backgroundColor: AppColors.primary.withAlpha(20),
+                        child: const Icon(Icons.person_rounded, color: AppColors.primary),
+                      ),
+                      title: Text(
+                        isWorker ? (customer['name'] ?? 'Customer') : (worker['name'] ?? 'Worker'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        isWorker ? 'Customer' : 'Skilled Worker (${workerProfile['address'] ?? 'Active'})',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                             ),
-                          );
-                        },
-                        child: const Text('View Profile'),
-                      )
-                    : null,
+                            onPressed: () => _openChat(context),
+                            icon: const Icon(Icons.chat_bubble_rounded, size: 18, color: Colors.white),
+                            label: Text(
+                              isWorker ? 'Message Customer' : 'Message Worker',
+                              style: const TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                          ),
+                        ),
+                        if (!isWorker && workerProfile['id'] != null) ...[
+                          const SizedBox(width: 8),
+                          OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => PublicWorkerProfileScreen(workerProfileId: workerProfile['id']),
+                                ),
+                              );
+                            },
+                            child: const Text('Profile', style: TextStyle(fontSize: 13)),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),

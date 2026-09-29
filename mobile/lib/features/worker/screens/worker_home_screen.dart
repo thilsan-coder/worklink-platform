@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/screens/login_choice_screen.dart';
+import '../../chat/screens/conversations_screen.dart';
 import '../../customer/screens/customer_home_screen.dart';
 import '../../jobs/screens/worker_jobs_screen.dart';
 import '../../profile/screens/worker_profile_screen.dart';
@@ -78,7 +79,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         children: [
           const WorkerJobsScreen(),
           const WorkerJobsScreen(),
-          const Center(child: Text('Job Chats (Phase 8)')),
+          const ConversationsScreen(),
           const WorkerProfileScreen(),
         ],
       ),
