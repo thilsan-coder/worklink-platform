@@ -308,7 +308,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             );
           },
-          child: Container(
+          child: Material(
             color: notif.isRead ? Colors.transparent : AppColors.primary.withAlpha(12),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
