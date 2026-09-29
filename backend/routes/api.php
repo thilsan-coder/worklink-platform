@@ -39,6 +39,8 @@ Route::get('/categories/{id}', [CategoryController::class, 'show']);
 Route::get('/skills', [SkillController::class, 'index']);
 Route::get('/workers', [WorkerController::class, 'index']);
 Route::get('/workers/{id}', [WorkerController::class, 'show']);
+Route::get('/workers/{worker}/reviews', [ReviewController::class, 'workerReviews']);
+Route::get('/workers/{worker}/rating', [ReviewController::class, 'workerRating']);
 Route::get('/reviews/worker/{workerUserId}', [ReviewController::class, 'workerReviews']);
 
 /*
@@ -87,6 +89,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::match(['post', 'put', 'patch'], '/jobs/{id}/cancel', [JobController::class, 'cancel']);
     Route::post('/jobs/{id}/proof', [JobController::class, 'uploadProof']);
 
+    // Job Review Endpoints
+    Route::get('/jobs/{job}/review', [ReviewController::class, 'jobReview']);
+    Route::post('/jobs/{job}/review', [ReviewController::class, 'store']);
+
     // Jobs & Conversation Link
     Route::match(['get', 'post'], '/jobs/{job}/conversation', [ChatController::class, 'forJob']);
     Route::match(['get', 'post'], '/jobs/{job}/chat', [ChatController::class, 'forJob']);
@@ -106,6 +112,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Reviews & Complaints
     Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::put('/reviews/{id}', [ReviewController::class, 'update']);
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
     Route::get('/complaints', [ComplaintController::class, 'index']);
     Route::post('/complaints', [ComplaintController::class, 'store']);
 

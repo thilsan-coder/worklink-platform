@@ -54,6 +54,9 @@ class ApiEndpoints {
   static String messageRead(int id) => '$baseUrl/messages/$id/read';
   static String jobConversation(int jobId) => '$baseUrl/jobs/$jobId/conversation';
   static String get reviews => '$baseUrl/reviews';
+  static String jobReview(int jobId) => '$baseUrl/jobs/$jobId/review';
+  static String workerReviews(int workerId) => '$baseUrl/workers/$workerId/reviews';
+  static String workerRating(int workerId) => '$baseUrl/workers/$workerId/rating';
   static String get complaints => '$baseUrl/complaints';
   static String get notifications => '$baseUrl/notifications';
 }

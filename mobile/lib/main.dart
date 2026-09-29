@@ -6,6 +6,7 @@ import 'features/chat/providers/chat_provider.dart';
 import 'features/discovery/providers/worker_discovery_provider.dart';
 import 'features/jobs/providers/job_provider.dart';
 import 'features/profile/providers/profile_provider.dart';
+import 'features/reviews/providers/review_provider.dart';
 import 'features/splash/screens/splash_screen.dart';
 
 void main() {
@@ -25,6 +26,7 @@ class WorkLinkApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => WorkerDiscoveryProvider()),
         ChangeNotifierProvider(create: (_) => JobProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => ReviewProvider()),
       ],
       child: MaterialApp(
         title: 'WorkLink',

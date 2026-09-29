@@ -5,6 +5,8 @@ import '../../auth/providers/auth_provider.dart';
 import '../../chat/providers/chat_provider.dart';
 import '../../chat/screens/chat_screen.dart';
 import '../../profile/screens/public_worker_profile_screen.dart';
+import '../../reviews/providers/review_provider.dart';
+import '../../reviews/widgets/review_modal_sheet.dart';
 import '../providers/job_provider.dart';
 import '../widgets/status_timeline_widget.dart';
 
@@ -26,6 +28,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<JobProvider>().fetchJobDetails(widget.jobId);
+      context.read<ReviewProvider>().fetchJobReview(widget.jobId);
     });
   }
 
@@ -400,7 +403,107 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
               history: provider.jobHistory,
               currentStatus: status,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+
+            // Review & Rating Section for Completed Jobs
+            Consumer<ReviewProvider>(
+              builder: (context, reviewProv, _) {
+                final jobReview = reviewProv.getJobReview(widget.jobId);
+                final bool isCompleted = ['COMPLETED', 'WORK_COMPLETED', 'CUSTOMER_CONFIRMED'].contains(status.toUpperCase());
+
+                if (!isCompleted) return const SizedBox.shrink();
+
+                if (jobReview != null) {
+                  final rating = (jobReview['rating'] ?? jobReview['overall_rating'] ?? 5) as num;
+                  final comment = (jobReview['comment'] ?? jobReview['review'] ?? '').toString();
+
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    color: AppColors.surface,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: AppColors.accent.withAlpha(80)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.accent.withAlpha(30),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.star_rounded, color: AppColors.accent, size: 20),
+                              ),
+                              const SizedBox(width: 10),
+                              const Expanded(
+                                child: Text(
+                                  'Review Submitted',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                              ),
+                              Row(
+                                children: List.generate(5, (i) {
+                                  return Icon(
+                                    i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                                    size: 18,
+                                    color: i < rating ? AppColors.accent : AppColors.textMuted,
+                                  );
+                                }),
+                              ),
+                            ],
+                          ),
+                          if (comment.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              comment,
+                              style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, height: 1.3),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                // If not reviewed yet and current user is customer
+                if (!isWorker) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        ReviewModalSheet.show(
+                          context,
+                          jobId: widget.jobId,
+                          jobTitle: job['title'] ?? 'Job Request',
+                          workerName: worker['name'] ?? 'Worker',
+                          onReviewSubmitted: () {
+                            reviewProv.fetchJobReview(widget.jobId);
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.star_rounded, color: Colors.white),
+                      label: const Text(
+                        'Rate & Review Worker',
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                    ),
+                  );
+                }
+
+                return const SizedBox.shrink();
+              },
+            ),
 
             // Actions Bar
             if (provider.isActionLoading)

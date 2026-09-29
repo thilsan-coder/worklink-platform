@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_endpoints.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../reviews/providers/review_provider.dart';
 
 class PublicWorkerProfileScreen extends StatefulWidget {
   final int workerProfileId;
@@ -25,6 +27,9 @@ class _PublicWorkerProfileScreenState extends State<PublicWorkerProfileScreen> {
   void initState() {
     super.initState();
     _fetchPublicWorkerProfile();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ReviewProvider>().fetchWorkerReviews(widget.workerProfileId);
+    });
   }
 
   Future<void> _fetchPublicWorkerProfile() async {
@@ -352,6 +357,191 @@ class _PublicWorkerProfileScreenState extends State<PublicWorkerProfileScreen> {
                   },
                 ),
               ),
+            const SizedBox(height: 28),
+
+            // Rating Summary & Reviews Section
+            Consumer<ReviewProvider>(
+              builder: (context, reviewProv, _) {
+                final reviews = reviewProv.workerReviews;
+                final ratingSummary = reviewProv.workerRatingSummary;
+                final avgRating = ratingSummary != null
+                    ? (ratingSummary['average_rating'] as num?)?.toDouble() ?? 0.0
+                    : (worker['average_rating'] as num?)?.toDouble() ?? 0.0;
+                final totalReviews = ratingSummary != null
+                    ? (ratingSummary['total_reviews'] as int?) ?? 0
+                    : (worker['total_reviews'] as int?) ?? 0;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Reviews & Ratings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(
+                          '$totalReviews reviews',
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Rating Summary Card
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  avgRating.toStringAsFixed(1),
+                                  style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                                ),
+                                Row(
+                                  children: List.generate(5, (i) {
+                                    return Icon(
+                                      i < avgRating.round() ? Icons.star_rounded : Icons.star_outline_rounded,
+                                      size: 16,
+                                      color: i < avgRating.round() ? AppColors.accent : AppColors.textMuted,
+                                    );
+                                  }),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '$totalReviews ratings',
+                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 20),
+                            const VerticalDivider(width: 1),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildRatingBar(5, totalReviews > 0 ? (reviews.where((r) => ((r['rating'] ?? r['overall_rating'] ?? 0) as num) == 5).length / totalReviews) : 0),
+                                  _buildRatingBar(4, totalReviews > 0 ? (reviews.where((r) => ((r['rating'] ?? r['overall_rating'] ?? 0) as num) == 4).length / totalReviews) : 0),
+                                  _buildRatingBar(3, totalReviews > 0 ? (reviews.where((r) => ((r['rating'] ?? r['overall_rating'] ?? 0) as num) == 3).length / totalReviews) : 0),
+                                  _buildRatingBar(2, totalReviews > 0 ? (reviews.where((r) => ((r['rating'] ?? r['overall_rating'] ?? 0) as num) == 2).length / totalReviews) : 0),
+                                  _buildRatingBar(1, totalReviews > 0 ? (reviews.where((r) => ((r['rating'] ?? r['overall_rating'] ?? 0) as num) == 1).length / totalReviews) : 0),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Reviews List
+                    if (reviewProv.isLoadingWorkerReviews && reviews.isEmpty)
+                      const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()))
+                    else if (reviews.isEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.border.withAlpha(80)),
+                        ),
+                        child: Column(
+                          children: const [
+                            Icon(Icons.rate_review_outlined, size: 40, color: AppColors.textMuted),
+                            SizedBox(height: 8),
+                            Text(
+                              'No reviews yet',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Be the first customer to hire and review this worker!',
+                              style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: reviews.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final rev = reviews[index];
+                          final custName = rev['customer_name'] ?? rev['customer']?['name'] ?? 'Customer';
+                          final custAvatar = rev['customer_avatar'] ?? rev['customer']?['avatar'];
+                          final rating = (rev['rating'] ?? rev['overall_rating'] ?? 5) as num;
+                          final comment = rev['comment'] ?? rev['review'] ?? '';
+                          final createdAt = rev['created_at'] != null
+                              ? rev['created_at'].toString().substring(0, 10)
+                              : '';
+
+                          return Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.border.withAlpha(80)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor: AppColors.primary.withAlpha(20),
+                                      backgroundImage: (custAvatar != null && custAvatar.toString().isNotEmpty)
+                                          ? NetworkImage(custAvatar)
+                                          : null,
+                                      child: (custAvatar == null || custAvatar.toString().isEmpty)
+                                          ? Text(
+                                              custName.isNotEmpty ? custName[0].toUpperCase() : 'C',
+                                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                            )
+                                          : null,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(custName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                          Text(createdAt, style: const TextStyle(fontSize: 10.5, color: AppColors.textMuted)),
+                                        ],
+                                      ),
+                                    ),
+                                    Row(
+                                      children: List.generate(5, (i) {
+                                        return Icon(
+                                          i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                                          size: 15,
+                                          color: i < rating ? AppColors.accent : AppColors.textMuted,
+                                        );
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                                if (comment.toString().isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    comment.toString(),
+                                    style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, height: 1.3),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                  ],
+                );
+              },
+            ),
             const SizedBox(height: 32),
 
             SizedBox(
@@ -364,6 +554,29 @@ class _PublicWorkerProfileScreenState extends State<PublicWorkerProfileScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRatingBar(int stars, double ratio) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Text('$stars★', style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: ratio.clamp(0.0, 1.0),
+                minHeight: 5,
+                backgroundColor: AppColors.border,
+                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
