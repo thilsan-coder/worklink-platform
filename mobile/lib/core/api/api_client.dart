@@ -29,15 +29,9 @@ class ApiClient {
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
-          if (kDebugMode) {
-            print('--> ${options.method} ${options.uri}');
-          }
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          if (kDebugMode) {
-            print('<-- ${response.statusCode} ${response.requestOptions.uri}');
-          }
           return handler.next(response);
         },
         onError: (DioException e, handler) {
